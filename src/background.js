@@ -4,6 +4,7 @@ import { app, protocol, BrowserWindow, powerMonitor, ipcMain, Menu, Notification
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { autoUpdater } from "electron-updater"
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const path = require("path");
 
@@ -134,6 +135,6 @@ ipcMain.on('check-unlock-screen',(event) => {
 })
 
 ipcMain.on('show-notification',(event, args) => {
-  const icon = showNotification(args)
-  event.reply('reply-notification',icon)
+  const iconPath = showNotification(args)
+  event.reply('reply-notification',iconPath)
 })

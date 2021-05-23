@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <div style="position:absolute;right:5px;bottom:0">
+      <small> version: {{appVersion}} </small>
+    </div>
     <img alt="Blueprint logo" src="../../public/blueprint.png" style="width: 200px;">
     <div v-if="isInvalid && attendanceData.status != 'Break'">
       <textarea v-model="reason" cols="30" rows="3"></textarea>
@@ -38,6 +41,7 @@ import { ipcRenderer } from 'electron'
 import { ref } from 'vue'
 import axios from 'axios'
 import { useStore } from 'vuex'
+import { version } from '../../package.json';
 
 export default {
   name: 'Home',
@@ -48,6 +52,7 @@ export default {
 
     const store = useStore()
 
+    const appVersion = ref(version)
     const modalMessage = ref('')
     const errorText  = ref('')
     const isInvalid = ref(false)
@@ -215,6 +220,7 @@ export default {
     }
 
     return {
+      appVersion,
       modalMessage,
       attendanceData,
       store,
