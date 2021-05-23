@@ -5,6 +5,7 @@ module.exports = {
         builderOptions: {
           productName: "Blueprint",
           appId: 'Blueprint',
+          publish: ['github'],
           win: {
             "target": [
                 "nsis"
