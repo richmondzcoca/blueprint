@@ -7,6 +7,9 @@
     <div v-if="isInvalid && attendanceData.status != 'Break'">
       <textarea v-model="reason" cols="30" rows="3"></textarea>
     </div>
+    <div class="invalid-feedback" :style="[reasonResponse ? {'display': 'block'} : {'display': 'none'}]">
+        {{ reasonResponse }}
+    </div>
     <div style="font-size: 60px;
     font-weight: bold;">
       {{ timeStartedText.hours }}:{{ timeStartedText.minutes }}:{{ timeStartedText.seconds }}
@@ -57,6 +60,7 @@ export default {
     const errorText  = ref('')
     const isInvalid = ref(false)
     const reason = ref('')
+    const reasonResponse = ref()
     const timeStartedText = ref({
       hours: '00',
       minutes: '00',
@@ -65,7 +69,7 @@ export default {
     const yesSpinner = ref(false)
     const modalButtonText = ref('')
 
-    ipcRenderer.on('reply-notification',(event, args) =>{
+    ipcRenderer.on('get-system-idle',(event, args) => {
       console.log(args);
     })
 
@@ -169,7 +173,9 @@ export default {
             yesSpinner.value = false
             if(error.response.status == 500){
               isInvalid.value = true
-              errorText.value = error.response.data
+              reasonResponse.value = error.response.data
+              close()
+              return
             }
             localStorage.removeItem('token')
             window.location.href = '#/login'
@@ -220,6 +226,7 @@ export default {
     }
 
     return {
+      reasonResponse,
       appVersion,
       modalMessage,
       attendanceData,
@@ -240,6 +247,12 @@ export default {
 <style scoped>
   .home{
     width: 100%;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   li{
     list-style: none;
@@ -291,7 +304,6 @@ export default {
   @media only screen and (max-width: 600px) {
     .bp-modal-container {
       width: 90% !important;
-      /* height: 30% !important; */
     }
   }
 </style>

@@ -17,9 +17,11 @@ app.setAppUserModelId('Blueprint')
 
 // Menu.setApplicationMenu(null); // Remove Menus
 
+let win = undefined
+
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 450,
     height: 450,
     center: true,
@@ -64,7 +66,6 @@ const showNotification = (param) => {
     }
     $notification = new Notification(notification)
     $notification.show()
-    return icon
   }
 }
 
@@ -96,7 +97,19 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+
+  // getSystemIdle()
+
 })
+
+const getSystemIdle = () => {
+  setTimeout(() => {
+    if(powerMonitor.getSystemIdleTime() > 10){
+      win.webContents.send('get-system-idle',{systemIdle: powerMonitor.getSystemIdleTime()})
+    }
+    getSystemIdle()
+  }, 1000);
+}
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
@@ -113,28 +126,13 @@ if (isDevelopment) {
   }
 }
 
-ipcMain.on('asynchronous-message', (event, args) => {
-  const $powerMonitor = {
-    systemIdleState: powerMonitor.getSystemIdleState(1),
-    systemIdleTime: powerMonitor.getSystemIdleTime(),
-    seconds: args.seconds
-  }
-  event.reply('asynchronous-reply', $powerMonitor);
-})
-
-ipcMain.on('power-lock-screen',(event) => {
-  powerMonitor.on('lock-screen',() => {
-    event.reply('response-power-lock-screen', true);
-  })
-})
-
-ipcMain.on('check-unlock-screen',(event) => {
-  powerMonitor.on('unlock-screen',() => {
-    event.reply('response-unlock-screen', true);
-  })
-})
-
 ipcMain.on('show-notification',(event, args) => {
-  const iconPath = showNotification(args)
-  event.reply('reply-notification',iconPath)
+  showNotification(args)
+})
+
+ipcMain.on('get-system-idle',(event) => {
+  const systemIdle = {
+    systemIdle: powerMonitor.getSystemIdleState(5)
+  }
+  event.reply('send-system-idle', systemIdle)
 })
